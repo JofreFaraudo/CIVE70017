@@ -1,0 +1,26 @@
+# This program parses the original parquet files into the desired format for this project, i.e., filtering by American Airlines only as well as merging all the data into a single parquet file.
+
+# Imports
+import pandas as pd
+
+# Files to read
+#PATH = "./data_raw/" # Restricted-access folder
+#FILES = ["2021-07-01-metadata.pq","2021-07-02-metadata.pq","2021-07-03-metadata.pq","2021-07-04-metadata.pq","2021-07-05-metadata.pq","2021-07-06-metadata.pq","2021-07-07-metadata.pq"]
+FILE = "./data_raw/2021-07-0{}-metadata.pq"
+first = 1
+last = 7
+
+# Unpack
+i = first
+frames = []
+while i <= last:
+    frames.append(pd.read_parquet(FILE.format(i)))
+    frames[-1].insert(0,"Date",i)
+    i += 1
+merge = pd.concat(frames) # Using a list to avoid unecessary copies
+#data_df = pd.read_parquet(PATH+FILES[0]).columns
+#print(data_df)
+
+# Saving
+merge.to_parquet("./data_parsed/metadata_merged.pq")
+print(merge)
