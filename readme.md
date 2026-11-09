@@ -8,7 +8,7 @@ All output and auxiliary files will be stored inside the folder `data_parsed`, w
 
 ## TO-DO's
 ### Workflow for LTOs
-1. Group all LTO combinations for aicraft, airport (icao code), and landing/takeoff (as bool) -> `count`.
+1. Group all LTO combinations for aicraft (full data parsing required), airport (icao code), and landing/takeoff (as bool) -> `count`.
 2. Obtain, and append to new columns, unitary results from the unparsed cells (totals) -> `W40:48` or `AO40:48`.
 3. Perform scaling to match actual number.
 
