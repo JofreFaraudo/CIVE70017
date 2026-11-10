@@ -2,15 +2,26 @@ import pandas as pd
 
 # Files
 LOAD = "./data_parsed/metadata.pq"
-SAVE = "./data_parsed/AAmainline.pq"
+SAVE = "./data_parsed/operations.pq"
 
 # Models to exclude or include
-LIST = ['E75L', 'E145', 'CRJ7']
-IS_WHITELIST = False # True: only models in list will be saved - whitelist mode. False: models in list will be dropped - blacklist mode.
-
+#FILTER = {"A319":"iei prova", "B77W":"aa", "A320":"hh", "B789":"jjj"}
+FILTER = {"A319":"A319   (Airbus A-319) with CFM56-5B5/P engines ***","B77W":"B77W   (Boeing 777-300ER) with GE90-115B engines ***","B772":"B772   (Boeing 777-200) with GE90-94B engines ***","B738":"B738   (Boeing 737-800) with CFM56-7B26 engines ***","B38M":"B38M   (Boeing 737 Max 8)","A320":"A320   (Airbus A-320) with CFM56-5B4/P engines","A21N":"A21N   (Airbus A-321 NEO) with LEAP-1A32 engines ***","A321":"A321   (Airbus A-321) with V2533-A5 engines ***","B789":"B789   (Boeing 787-9 Dreamliner) with GEnx-1B64 engines","B788":"B788   (Boeing 787-8 Dreamliner) with GEnx-1B64 engines ***"}
 
 # Actual code
+df = pd.read_parquet(LOAD, filters=[[("aircraft_type_icao", "==", model)] for model in FILTER])
 
-df = pd.read_parquet(LOAD, filters=[("aircraft_type_icao", "in" if IS_WHITELIST else "not in", )])
-print(df["aircraft_type_icao"].unique())
-#df.to_parquet(SAVE)
+# New dataframe making
+takeoffs = df.groupby(["aircraft_type_icao", "origin_airport"])["Date"].agg("count").reset_index().rename(columns={"Date":"Quantity","origin_airport":"Airport"})
+takeoffs.insert(2,"is_landing",False)
+landings = df.groupby(["aircraft_type_icao", "destination_airport"])["Date"].agg("count").reset_index().rename(columns={"Date":"Quantity","destination_airport":"Airport"})
+landings.insert(2,"is_landing",True)
+operations = pd.concat([takeoffs, landings])
+
+# Updating aicraft names
+print(operations, operations["aircraft_type_icao"].unique())
+operations.replace({"aircraft_type_icao":FILTER}, inplace=True)
+#operations.replace(FILTER)
+print(operations, operations["aircraft_type_icao"].unique())
+
+#operations.to_parquet(SAVE)
