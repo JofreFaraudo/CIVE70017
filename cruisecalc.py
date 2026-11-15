@@ -1,4 +1,4 @@
-import xlwings as wg
+#import xlwings as wg
 import pandas as pd
 from time import sleep
 
@@ -14,7 +14,9 @@ CCD = "D21"
 RESULTS = "G21:P21"
 HEADERS = "G17:P17"
 MODELS = ["A319", "B77W", "B772", "B738", "B38M", "A320", "A21N", "A321", "B789", "B788"]
+NM_TO_KM = 1.852
 
+"""
 # Excel setup
 app = wg.App(visible=False, add_book=False)
 app.screen_updating = False
@@ -25,7 +27,16 @@ print(sheet.range(RESULTS).value)
 
 """
 # Load files
-flights = pd.read_parquet(LOAD, filters=[[("aircraft_type_icao", "==", model)] for model in FILTER])
+flights = pd.read_parquet(LOAD, filters=[[("aircraft_type_icao", "==", model)] for model in MODELS])
+print(flights)
+maxs = flights.groupby("aircraft_type_icao", as_index=False)["total_distance_km"].max()
+print(maxs)
+maxs["dist_nm"] = maxs["total_distance_km"]/NM_TO_KM
+print(maxs)
+maxs.to_csv("./data_parsed/ranges.csv")
+
+
+"""
 wb = app.books.open(WORKBOOK)
 sheet = wb.sheets[SHEET]
 
@@ -46,6 +57,8 @@ print(results)
 results.to_parquet(SAVE)
 """
 
+"""
 # Closing excel file
 wb.close()
 app.quit()
+"""
