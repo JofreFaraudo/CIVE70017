@@ -15,7 +15,7 @@ CCD = "D21"
 RESULTS = "G21:P21"
 HEADERS = "G17:P17"
 MODELS = ["A319", "B77W", "B772", "B738", "B38M", "A320", "A21N", "A321", "B789", "B788"]
-REPLACEMENTS = {"A21N":"A321", "B38M":"B737"}
+REPLACEMENTS = {"A21N":"A321", "B38M":"B738"}
 NM_TO_KM = 1.852
 INTERCEPTS = [974.63,3070.12,34.36,0.83,1198.66,2.08,-0.03,-0.1542,-0.0491,-0.2028]
 SLOPES = [6.05174,19.06296,0.08848,0.00508,7.44366,0.00714,0.00054,0.00166,0.0006372,0.002297]
@@ -68,6 +68,7 @@ for i in flights.itertuples():
         emdata.append([INTERCEPTS[j]+SLOPES[j]*i.total_distance_nmi for j in range(10)])
     else:
         sheet.range(MODEL).value = i.aircraft_type_icao
+        sheet.range(CCD).value = i.total_distance_nmi
         sleep(0)
         emdata.append(sheet.range(RESULTS).value)
         sleep(0)
